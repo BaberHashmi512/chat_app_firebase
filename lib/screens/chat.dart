@@ -17,8 +17,6 @@ class _ChatScreenState extends State<ChatScreen> {
 
     await fcm.requestPermission();
     fcm.subscribeToTopic('chat');
-    // final token = await fcm.getToken();
-    // print('Token $token');
   }
 
   @override
@@ -35,13 +33,14 @@ class _ChatScreenState extends State<ChatScreen> {
         title: const Text("Chat Screen"),
         actions: [
           IconButton(
-              onPressed: () {
-                FirebaseAuth.instance.signOut();
-              },
-              icon: Icon(
-                Icons.exit_to_app,
-                color: Theme.of(context).colorScheme.primary,
-              ))
+            onPressed: () {
+              FirebaseAuth.instance.signOut();
+            },
+            icon: Icon(
+              Icons.exit_to_app,
+              color: Theme.of(context).colorScheme.primary,
+            ),
+          ),
         ],
       ),
       body: const Column(
