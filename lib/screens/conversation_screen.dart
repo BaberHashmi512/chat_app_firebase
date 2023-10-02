@@ -14,23 +14,27 @@ class _ConversationScreenState extends State<ConversationScreen> {
   Map<String, dynamic>? userMap;
   bool isLoading = false;
   final TextEditingController _searchController = TextEditingController();
-   chatRoomId (String user1, String user2){
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+
+
+  String chatRoomId(String user1, String user2) {
     if (user1[0].toLowerCase().codeUnits[0] >
-        user2.toLowerCase().codeUnits[0]){
-      return  "$user1$user2";
-    } else{
-      "$user2$user1";
+        user2.toLowerCase().codeUnits[0]) {
+      return "$user1$user2";
+    } else {
+      return "$user2$user1";
     }
   }
-
   void onSearch() async {
-    FirebaseFirestore fireStore = FirebaseFirestore.instance;
+    FirebaseFirestore firestore = FirebaseFirestore.instance;
+
     setState(() {
       isLoading = true;
     });
-    await fireStore
+
+    await firestore
         .collection('users')
-        .where('username', isEqualTo: _searchController.text)
+        .where("username", isEqualTo: _searchController.text)
         .get()
         .then((value) {
       setState(() {
@@ -101,13 +105,19 @@ class _ConversationScreenState extends State<ConversationScreen> {
                 ),
                 userMap != null
                     ? ListTile(
-                        onTap: (){
-                          String roomId = chatRoomId(, userMap!['username']);
+                        onTap: () {
+                          String roomId = chatRoomId(
+                              _auth.currentUser!.displayName!,
+                              userMap!['username']);
                           Navigator.of(context).push(
-                          MaterialPageRoute(builder: (_)=> ChatRoom(
-                            chatRoomId: ,
-                          ))
-                        );},
+                            MaterialPageRoute(
+                              builder: (_) => ChatRoom(
+                                userMap: userMap,
+                                chatRoomId: roomId,
+                              ),
+                            ),
+                          );
+                        },
                         leading: CircleAvatar(
                           radius: 23,
                           child: ClipOval(
