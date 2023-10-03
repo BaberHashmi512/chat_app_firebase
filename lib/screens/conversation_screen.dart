@@ -15,7 +15,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
   bool isLoading = false;
   final TextEditingController _searchController = TextEditingController();
   final FirebaseAuth _auth = FirebaseAuth.instance;
-
+  final FirebaseFirestore fireStore = FirebaseFirestore.instance;
 
   String chatRoomId(String user1, String user2) {
     if (user1[0].toLowerCase().codeUnits[0] >
@@ -25,14 +25,15 @@ class _ConversationScreenState extends State<ConversationScreen> {
       return "$user2$user1";
     }
   }
+
   void onSearch() async {
-    FirebaseFirestore firestore = FirebaseFirestore.instance;
+    FirebaseFirestore fireStore = FirebaseFirestore.instance;
 
     setState(() {
       isLoading = true;
     });
 
-    await firestore
+    await fireStore
         .collection('users')
         .where("username", isEqualTo: _searchController.text)
         .get()
@@ -107,12 +108,12 @@ class _ConversationScreenState extends State<ConversationScreen> {
                     ? ListTile(
                         onTap: () {
                           String roomId = chatRoomId(
-                              _auth.currentUser!.displayName!,
+                              _auth.currentUser!.displayName.toString(),
                               userMap!['username']);
                           Navigator.of(context).push(
                             MaterialPageRoute(
                               builder: (_) => ChatRoom(
-                                userMap: userMap,
+                                userMap: userMap!,
                                 chatRoomId: roomId,
                               ),
                             ),

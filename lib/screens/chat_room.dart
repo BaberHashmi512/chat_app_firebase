@@ -12,6 +12,7 @@ class ChatRoom extends StatelessWidget {
   final FirebaseFirestore fireStore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
+      ///  sending a Message
   void onSendMessage() async {
     if (_message.text.isNotEmpty) {
       Map<String, dynamic> messages = {
@@ -20,6 +21,7 @@ class ChatRoom extends StatelessWidget {
         "type": "text",
         "time": FieldValue.serverTimestamp(),
       };
+
       _message.clear();
       await fireStore
           .collection('chatroom')
@@ -30,7 +32,6 @@ class ChatRoom extends StatelessWidget {
       print("Enter Some Text");
     }
   }
-
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
@@ -47,9 +48,9 @@ class ChatRoom extends StatelessWidget {
                 width: size.width,
                 child: StreamBuilder<QuerySnapshot>(
                   stream: fireStore
-                      .collection('users')
+                      .collection('chatroom')
                       .doc(chatRoomId)
-                      .collection('chat')
+                      .collection('chats')
                       .orderBy("time", descending: false)
                       .snapshots(),
                   builder: (BuildContext context,
@@ -81,13 +82,15 @@ class ChatRoom extends StatelessWidget {
                     children: [
                       SizedBox(
                         height: size.height / 17,
-                        width: size.height / 1.3,
+                        width: size.width / 1.3,
                         child: TextField(
                           controller: _message,
                           decoration: InputDecoration(
-                              hintText: 'Send Message',
-                              border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(8))),
+                            hintText: 'Send Message',
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
                         ),
                       ),
                       IconButton(
@@ -105,12 +108,12 @@ class ChatRoom extends StatelessWidget {
   Widget messages(Size size, Map<String, dynamic> map, BuildContext context) {
     return Container(
       width: size.width,
-      alignment: map['sendby'] == _auth.currentUser?.displayName
+      alignment: map['sendby'] == _auth.currentUser!.displayName
           ? Alignment.centerRight
           : Alignment.centerLeft,
       child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 10,horizontal: 14),
-        margin: const EdgeInsets.symmetric(vertical: 5,horizontal: 8),
+        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 14),
+        margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 8),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(15),
           color: Colors.blue,
@@ -118,10 +121,7 @@ class ChatRoom extends StatelessWidget {
         child: Text(
           map['messages'],
           style: const TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.w500,
-            color: Colors.white
-          ),
+              fontSize: 18, fontWeight: FontWeight.w500, color: Colors.white),
         ),
       ),
     );
