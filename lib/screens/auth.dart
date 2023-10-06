@@ -15,6 +15,7 @@ class AuthScreen extends StatefulWidget {
 }
 
 class _AuthScreenState extends State<AuthScreen> {
+  final FirebaseAuth _auth = FirebaseAuth.instance;
   final _form = GlobalKey<FormState>();
   var _isLogin = true;
   var _enteredEmail = "";
@@ -61,6 +62,7 @@ class _AuthScreenState extends State<AuthScreen> {
             'email': _enteredEmail,
             'status':'Unavailable',
             'image_url': imageUrl,
+            "uid": _auth.currentUser!.uid,
           });
         }
       } on FirebaseAuthException catch (error) {

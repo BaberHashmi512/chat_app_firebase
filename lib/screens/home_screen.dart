@@ -3,19 +3,44 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
-class ConversationScreen extends StatefulWidget {
-  const ConversationScreen({super.key});
+class HomeScreen extends StatefulWidget {
+  const HomeScreen({super.key});
 
   @override
-  State<ConversationScreen> createState() => _ConversationScreenState();
+  State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _ConversationScreenState extends State<ConversationScreen> {
+class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   Map<String, dynamic>? userMap;
   bool isLoading = false;
   final TextEditingController _searchController = TextEditingController();
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore fireStore = FirebaseFirestore.instance;
+
+  @override
+  void initState() {
+    WidgetsBinding.instance.addObserver(this);
+    setStatus("Online");
+    super.initState();
+  }
+  void setStatus(String status) async{
+
+    await fireStore.collection('users').doc(_auth.currentUser!.uid).update({
+      "status":status,
+    });
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state){
+
+    if(state == AppLifecycleState.resumed){
+      setStatus("Online");
+    // online
+    }else{
+      setStatus("Offline");
+    // offline
+    }
+  }
 
   String chatRoomId(String user1, String user2) {
     if (user1[0].toLowerCase().codeUnits[0] >
