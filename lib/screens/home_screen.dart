@@ -1,3 +1,4 @@
+import 'package:chat_app/group_chat/group_chat_screen.dart';
 import 'package:chat_app/screens/chat_room.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -23,22 +24,21 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     setStatus("Online");
     super.initState();
   }
-  void setStatus(String status) async{
 
+  void setStatus(String status) async {
     await fireStore.collection('users').doc(_auth.currentUser!.uid).update({
-      "status":status,
+      "status": status,
     });
   }
 
   @override
-  void didChangeAppLifecycleState(AppLifecycleState state){
-
-    if(state == AppLifecycleState.resumed){
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
       setStatus("Online");
-    // online
-    }else{
+      // online
+    } else {
       setStatus("Offline");
-    // offline
+      // offline
     }
   }
 
@@ -164,6 +164,14 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                     : Container(),
               ],
             ),
+      floatingActionButton: FloatingActionButton(
+        child: const Icon(Icons.group),
+        onPressed: () => Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (_) => const GroupChatHomeScreen(),
+          ),
+        ),
+      ),
     );
   }
 }

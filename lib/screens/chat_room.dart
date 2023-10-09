@@ -106,7 +106,7 @@ class ChatRoom extends StatelessWidget {
                     Text(userMap!['username']),
                     Text(
                       snapshot.data!['status'],
-                      style: TextStyle(fontSize: 14),
+                      style: const TextStyle(fontSize: 14),
                     ),
                   ],
                 ),
