@@ -1,3 +1,4 @@
+import 'package:chat_app/group_chat/create_group/add_members.dart';
 import 'package:chat_app/group_chat/group_chat_room.dart';
 import 'package:flutter/material.dart';
 
@@ -30,7 +31,9 @@ class _GroupChatHomeScreenState extends State<GroupChatHomeScreen> {
       }),
       floatingActionButton: FloatingActionButton(
         tooltip: "Create Group",
-          onPressed: (){},
+          onPressed: () => Navigator.of(context).push(
+            MaterialPageRoute(builder: (_)=> AddMembersInGroup(),),
+          ),
         child: const Icon(Icons.create)),
     );
   }
