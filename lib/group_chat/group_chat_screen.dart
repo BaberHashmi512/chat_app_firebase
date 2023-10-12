@@ -17,6 +17,7 @@ class _GroupChatHomeScreenState extends State<GroupChatHomeScreen> {
   bool isLoading = true;
 
   List groupList = [];
+
   @override
   void initState() {
     // TODO: implement initState
@@ -32,10 +33,10 @@ class _GroupChatHomeScreenState extends State<GroupChatHomeScreen> {
         .collection('groups')
         .get()
         .then((value) {
-          setState(() {
-            groupList =value.docs;
-            isLoading = false;
-          });
+      setState(() {
+        groupList = value.docs;
+        isLoading = false;
+      });
     });
   }
 
@@ -47,29 +48,38 @@ class _GroupChatHomeScreenState extends State<GroupChatHomeScreen> {
       appBar: AppBar(
         title: const Text("Groups"),
       ),
-      body: isLoading? Container(
-        height: size.height,
-        width: size.width,
-        alignment: Alignment.center,
-        child: CircularProgressIndicator(),
-      ) : ListView.builder(
-          itemCount: groupList.length,
-          itemBuilder: (context, index) {
-            return ListTile(
-              onTap: () => Navigator.of(context)
-                  .push(MaterialPageRoute(builder: (_) => GroupChatRoom(groupChatId: groupList[index]['id'],))),
-              leading: const Icon(Icons.group),
-              title: Text(groupList[index]['name']),
-            );
-          }),
+      body: isLoading
+          ? Container(
+              height: size.height,
+              width: size.width,
+              alignment: Alignment.center,
+              child: const CircularProgressIndicator(),
+            )
+          : ListView.builder(
+              itemCount: groupList.length,
+              itemBuilder: (context, index) {
+                return ListTile(
+                  onTap: () => Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (_) => GroupChatRoom(
+                        groupName: groupList[index]['name'],
+                        groupChatId: groupList[index]['id'],
+                      ),
+                    ),
+                  ),
+                  leading: const Icon(Icons.group),
+                  title: Text(groupList[index]['name']),
+                );
+              }),
       floatingActionButton: FloatingActionButton(
-          tooltip: "Create Group",
-          onPressed: () => Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (_) => AddMembersInGroup(),
-                ),
-              ),
-          child: const Icon(Icons.create)),
+        tooltip: "Create Group",
+        onPressed: () => Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (_) => const AddMembersInGroup(),
+          ),
+        ),
+        child: const Icon(Icons.create),
+      ),
     );
   }
 }
