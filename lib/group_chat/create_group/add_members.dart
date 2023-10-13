@@ -25,38 +25,46 @@ class _AddMembersInGroupState extends State<AddMembersInGroup> {
   }
 
   void getCurrentUserDetails() async {
-    await _firestore
-        .collection('users')
-        .doc(_auth.currentUser!.uid)
-        .get()
-        .then((map) {
-      setState(() {
-        membersList.add({
-          "username": map['username'],
-          "email": map['email'],
-          "uid": map['uid'],
-          "isAdmin": true,
-        });
-      });
-    });
+    await _firestore.collection('users').doc(_auth.currentUser!.uid).get().then(
+      (map) {
+        setState(
+          () {
+            membersList.add(
+              {
+                "username": map['username'],
+                "email": map['email'],
+                "uid": map['uid'],
+                "isAdmin": true,
+              },
+            );
+          },
+        );
+      },
+    );
   }
 
   void onSearch() async {
-    setState(() {
-      isLoading = true;
-    });
+    setState(
+      () {
+        isLoading = true;
+      },
+    );
 
     await _firestore
         .collection('users')
         .where("email", isEqualTo: _search.text)
         .get()
-        .then((value) {
-      setState(() {
-        userMap = value.docs[0].data();
-        isLoading = false;
-      });
-      print(userMap);
-    });
+        .then(
+      (value) {
+        setState(
+          () {
+            userMap = value.docs[0].data();
+            isLoading = false;
+          },
+        );
+        print(userMap);
+      },
+    );
   }
 
   void onResultTap() {
@@ -69,24 +77,28 @@ class _AddMembersInGroupState extends State<AddMembersInGroup> {
     }
 
     if (!isAlreadyExist) {
-      setState(() {
-        membersList.add({
-          "username": userMap!['username'],
-          "email": userMap!['email'],
-          "uid": userMap!['uid'],
-          "isAdmin": false,
-        });
+      setState(
+        () {
+          membersList.add({
+            "username": userMap!['username'],
+            "email": userMap!['email'],
+            "uid": userMap!['uid'],
+            "isAdmin": false,
+          });
 
-        userMap = null;
-      });
+          userMap = null;
+        },
+      );
     }
   }
 
   void onRemoveMembers(int index) {
     if (membersList[index]['uid'] != _auth.currentUser!.uid) {
-      setState(() {
-        membersList.removeAt(index);
-      });
+      setState(
+        () {
+          membersList.removeAt(index);
+        },
+      );
     }
   }
 
@@ -161,15 +173,22 @@ class _AddMembersInGroupState extends State<AddMembersInGroup> {
                     subtitle: Text(userMap!['email']),
                     trailing: const Icon(Icons.add),
                   )
-                : SizedBox(),
+                : const SizedBox(),
           ],
         ),
       ),
-      floatingActionButton: membersList.length >= 2 ? FloatingActionButton(
-        onPressed: () => Navigator.of(context)
-            .push(MaterialPageRoute(builder: (_) =>   CreateGroup(membersList: membersList,))),
-        child: const Icon(Icons.forward),
-      ) : SizedBox(),
+      floatingActionButton: membersList.length >= 2
+          ? FloatingActionButton(
+              child: const Icon(Icons.forward),
+              onPressed: () => Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (_) => CreateGroup(
+                    membersList: membersList,
+                  ),
+                ),
+              ),
+            )
+          : const SizedBox(),
     );
   }
 }

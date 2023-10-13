@@ -1,14 +1,15 @@
-import 'package:chat_app/group_chat/create_group/add_members.dart';
-import 'package:chat_app/group_chat/group_chat_room.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
+import 'create_group/add_members.dart';
+import 'group_chat_room.dart';
+
 class GroupChatHomeScreen extends StatefulWidget {
-  const GroupChatHomeScreen({super.key});
+  const GroupChatHomeScreen({Key? key}) : super(key: key);
 
   @override
-  State<GroupChatHomeScreen> createState() => _GroupChatHomeScreenState();
+  _GroupChatHomeScreenState createState() => _GroupChatHomeScreenState();
 }
 
 class _GroupChatHomeScreenState extends State<GroupChatHomeScreen> {
@@ -20,13 +21,13 @@ class _GroupChatHomeScreenState extends State<GroupChatHomeScreen> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     getAvailableGroups();
   }
 
   void getAvailableGroups() async {
     String uid = _auth.currentUser!.uid;
+
     await _firestore
         .collection('users')
         .doc(uid)
@@ -42,8 +43,8 @@ class _GroupChatHomeScreenState extends State<GroupChatHomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    print(groupList);
     final Size size = MediaQuery.of(context).size;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text("Groups"),
@@ -70,14 +71,15 @@ class _GroupChatHomeScreenState extends State<GroupChatHomeScreen> {
                   leading: const Icon(Icons.group),
                   title: Text(groupList[index]['name']),
                 );
-              }),
+              },
+            ),
       floatingActionButton: FloatingActionButton(
-        tooltip: "Create Group",
         onPressed: () => Navigator.of(context).push(
           MaterialPageRoute(
             builder: (_) => const AddMembersInGroup(),
           ),
         ),
+        tooltip: "Create Group",
         child: const Icon(Icons.create),
       ),
     );
