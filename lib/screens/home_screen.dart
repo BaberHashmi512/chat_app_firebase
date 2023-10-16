@@ -145,14 +145,18 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                           );
                         },
                         leading: CircleAvatar(
-                          radius: 23,
-                          child: ClipOval(
-                            child: Image.network(
-                              userMap!['image_url'],
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-                        ),
+                          radius: 24,
+                          backgroundImage: NetworkImage(userMap!['image_url'],),
+                        ), 
+                        // CircleAvatar(
+                        //   radius: 23,
+                        //   child: ClipOval(
+                        //     child: Image.network(
+                        //       userMap!['image_url'],
+                        //       fit: BoxFit.cover,
+                        //     ),
+                        //   ),
+                        // ),
                         title: Text(
                           userMap!['username'],
                           style: const TextStyle(
@@ -161,7 +165,19 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                         subtitle: Text(userMap!['email']),
                         trailing: const Icon(Icons.chat),
                       )
-                    : Container(),
+                    : Container(
+                        child: const ListTile(
+                          leading: CircleAvatar(
+                            radius: 24,
+                            backgroundImage: NetworkImage(
+                                "https://images.pexels.com/photos/213780/pexels-photo-213780.jpeg?"
+                                "auto=compress&cs=tinysrgb&dpr=1&w=500"),
+                          ),
+                          title: Text("Baber"),
+                          subtitle: Text("baberhashmi512@gmail.com"),
+                          trailing: Icon(Icons.chat),
+                        ),
+                      ),
               ],
             ),
       floatingActionButton: FloatingActionButton(
