@@ -17,12 +17,33 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   final TextEditingController _searchController = TextEditingController();
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore fireStore = FirebaseFirestore.instance;
+  List<Map<String, dynamic>> membersList = [];
 
   @override
   void initState() {
     WidgetsBinding.instance.addObserver(this);
     setStatus("Online");
     super.initState();
+  }
+
+  void getCurrentUserDetails() async {
+    print("Baber");
+    await fireStore.collection('users').doc(_auth.currentUser!.uid).get().then(
+      (map) {
+        setState(
+          () {
+            membersList.add(
+              {
+                "username": map['username'],
+                "email": map['email'],
+                "image": map['image_url'],
+                "uid": map['uid'],
+              },
+            );
+          },
+        );
+      },
+    );
   }
 
   void setStatus(String status) async {
@@ -146,8 +167,10 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                         },
                         leading: CircleAvatar(
                           radius: 24,
-                          backgroundImage: NetworkImage(userMap!['image_url'],),
-                        ), 
+                          backgroundImage: NetworkImage(
+                            userMap!['image_url'],
+                          ),
+                        ),
                         // CircleAvatar(
                         //   radius: 23,
                         //   child: ClipOval(
@@ -166,17 +189,57 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                         trailing: const Icon(Icons.chat),
                       )
                     : Container(
-                        child: const ListTile(
-                          leading: CircleAvatar(
-                            radius: 24,
-                            backgroundImage: NetworkImage(
-                                "https://images.pexels.com/photos/213780/pexels-photo-213780.jpeg?"
-                                "auto=compress&cs=tinysrgb&dpr=1&w=500"),
+                        child: SingleChildScrollView(
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                               const Text(
+                                "Chats List",
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 24,
+                                ),
+                              ),
+                              ElevatedButton(
+                                onPressed: getCurrentUserDetails,
+                                child: const Text("test"),
+                              ),
+                              Flexible(
+                                child: ListView.builder(
+                                  itemCount: membersList.length,
+                                  shrinkWrap: true,
+                                  physics: const NeverScrollableScrollPhysics(),
+                                  itemBuilder: (context, index) {
+                                    return ListTile(
+                                      leading: CircleAvatar(
+                                        radius: 24,
+                                        backgroundImage: NetworkImage(
+                                            membersList[index]['image']),
+                                      ),
+                                      title:
+                                          Text(membersList[index]['username']),
+                                      subtitle:
+                                          Text(membersList[index]['email']),
+                                      trailing: const Icon(Icons.chat),
+                                    );
+                                  },
+                                ),
+                              ),
+                            ],
                           ),
-                          title: Text("Baber"),
-                          subtitle: Text("baberhashmi512@gmail.com"),
-                          trailing: Icon(Icons.chat),
                         ),
+
+                        // child: const ListTile(
+                        //   leading: CircleAvatar(
+                        //     radius: 24,
+                        //     backgroundImage: NetworkImage(
+                        // "https://images.pexels.com/photos/213780/pexels-photo-213780.jpeg?"
+                        //         "auto=compress&cs=tinysrgb&dpr=1&w=500"),
+                        //   ),
+                        //   title: Text("Baber"),
+                        //   subtitle: Text("baberhashmi512@gmail.com"),
+                        //   trailing: Icon(Icons.chat),
+                        // ),
                       ),
               ],
             ),
