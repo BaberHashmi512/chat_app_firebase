@@ -26,7 +26,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     super.initState();
   }
 
-  void getCurrentUserDetails() async {
+  void getCurrentUserChats() async {
     print("Baber");
     await fireStore.collection('users').doc(_auth.currentUser!.uid).get().then(
       (map) {
@@ -193,15 +193,15 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                               const Text(
+                              const Text(
                                 "Chats List",
                                 style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 24,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 24,
                                 ),
                               ),
                               ElevatedButton(
-                                onPressed: getCurrentUserDetails,
+                                onPressed: getCurrentUserChats,
                                 child: const Text("test"),
                               ),
                               Flexible(
@@ -228,18 +228,6 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                             ],
                           ),
                         ),
-
-                        // child: const ListTile(
-                        //   leading: CircleAvatar(
-                        //     radius: 24,
-                        //     backgroundImage: NetworkImage(
-                        // "https://images.pexels.com/photos/213780/pexels-photo-213780.jpeg?"
-                        //         "auto=compress&cs=tinysrgb&dpr=1&w=500"),
-                        //   ),
-                        //   title: Text("Baber"),
-                        //   subtitle: Text("baberhashmi512@gmail.com"),
-                        //   trailing: Icon(Icons.chat),
-                        // ),
                       ),
               ],
             ),

@@ -29,7 +29,7 @@ class ChatRoom extends StatelessWidget {
   }
 
   Future uploadImage() async {
-    String fileName = Uuid().v1();
+    String fileName = const Uuid().v1();
     int status = 1;
     await fireStore
         .collection('chatroom')
@@ -44,9 +44,7 @@ class ChatRoom extends StatelessWidget {
     });
     var ref =
         FirebaseStorage.instance.ref().child('images').child("$fileName.jpeg");
-    var uploadTask = await
-    ref.putFile(imageFile!).
-    catchError((error) async {
+    var uploadTask = await ref.putFile(imageFile!).catchError((error) async {
       await fireStore
           .collection('chatroom')
           .doc(chatRoomId)
@@ -89,98 +87,178 @@ class ChatRoom extends StatelessWidget {
     }
   }
 
+  void deleteMessage(messageId) async {
+    await FirebaseFirestore.instance
+        .collection("chatroom")
+        .doc(chatRoomId)
+        .collection("messages")
+        .doc(messageId)
+        .delete();
+  }
+
+  void editMessage(String messageId, String newText) async {
+    await FirebaseFirestore.instance
+        .collection("chatroom")
+        .doc(chatRoomId)
+        .collection("messages")
+        .doc(messageId)
+        .update({
+      "text": newText,
+      "edited": true,
+      "editedOn": DateTime.now(),
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
-    return Scaffold(
-      appBar: AppBar(
-        title: StreamBuilder<DocumentSnapshot>(
-          stream:
-          fireStore.collection("users").doc(userMap!['uid']).snapshots(),
-          builder: (context, snapshot) {
-            if (snapshot.data != null) {
-              return Container(
-                child: Column(
-                  children: [
-                    Text(userMap!['username']),
-                    Text(
-                      snapshot.data!['status'],
-                      style: const TextStyle(fontSize: 14),
-                    ),
-                  ],
-                ),
-              );
-            } else {
-              return Container();
-            }
-          },
+    return GestureDetector(
+      onTap: ()=> FocusManager.instance.primaryFocus?.unfocus(),
+      child: Scaffold(
+        resizeToAvoidBottomInset: true,
+        appBar: AppBar(
+          title: StreamBuilder<DocumentSnapshot>(
+            stream:
+                fireStore.collection("users").doc(userMap!['uid']).snapshots(),
+            builder: (context, snapshot) {
+              if (snapshot.data != null) {
+                return Container(
+                  child: Column(
+                    children: [
+                      Text(userMap!['username']),
+                      Text(
+                        snapshot.data!['status'],
+                        style: const TextStyle(fontSize: 14),
+                      ),
+                    ],
+                  ),
+                );
+              } else {
+                return Container();
+              }
+            },
+          ),
         ),
-      ),
-      body: SingleChildScrollView(
-        child: Column(
+        body: ListView(
+          keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+          shrinkWrap: true,
           children: [
-            SizedBox(
-              height: size.height / 1.25,
-              width: size.width,
-              child: StreamBuilder<QuerySnapshot>(
-                stream: fireStore
-                    .collection('chatroom')
-                    .doc(chatRoomId)
-                    .collection('chats')
-                    .orderBy("time", descending: false)
-                    .snapshots(),
-                builder: (BuildContext context,
-                    AsyncSnapshot<QuerySnapshot> snapshot) {
-                  if (snapshot.data != null) {
-                    return ListView.builder(
-                      itemCount: snapshot.data!.docs.length,
-                      itemBuilder: (context, index) {
-                        Map<String, dynamic> map = snapshot.data!.docs[index]
-                            .data() as Map<String, dynamic>;
-                        return messages(size, map, context);
-                      },
-                    );
-                  } else {
-                    return Container();
-                  }
-                },
-              ),
-            ),
-            Container(
-              height: size.height / 10,
-              width: size.width,
-              alignment: Alignment.center,
-              child: SizedBox(
-                height: size.height / 12,
-                width: size.width / 1.1,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    SizedBox(
-                      height: size.height / 17,
-                      width: size.width / 1.3,
-                      child: TextField(
-                        controller: _message,
-                        decoration: InputDecoration(
-                          suffixIcon: IconButton(
-                            onPressed: () => getImage(),
-                            icon: const Icon(Icons.photo),
-                          ),
-                          hintText: 'Send Message',
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
+            Column(
+              children: [
+                SizedBox(
+                  height: size.height / 1.25,
+                  width: size.width,
+                  child: StreamBuilder<QuerySnapshot>(
+                    stream: fireStore
+                        .collection('chatroom')
+                        .doc(chatRoomId)
+                        .collection('chats')
+                        .orderBy("time", descending: false)
+                        .snapshots(),
+                    builder: (BuildContext context,
+                        AsyncSnapshot<QuerySnapshot> snapshot) {
+                      if (snapshot.data != null) {
+                        return ListView.builder(
+                          itemCount: snapshot.data!.docs.length,
+                          itemBuilder: (context, index) {
+                            Map<String, dynamic> map = snapshot.data!.docs[index]
+                                .data() as Map<String, dynamic>;
+                            return GestureDetector(
+                                onLongPress: () {
+                                  showDialog(
+                                    context: (context),
+                                    builder: (context) {
+                                      return AlertDialog(
+                                        title: Container(
+                                          decoration: BoxDecoration(
+                                            borderRadius: BorderRadius.circular(30),
+                                          ),
+                                          child: Column(
+                                            children: [
+                                              const Center(
+                                                child: Text(
+                                                  "Delete or Edit",
+                                                  style: TextStyle(
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
+                                              ),
+                                              const SizedBox(
+                                                height: 30,
+                                              ),
+                                              const Text(
+                                                'Are you want to Delete or Edit this Message',
+                                              ),
+                                              const SizedBox(
+                                                height: 30,
+                                              ),
+                                              Row(
+                                                mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                                children: [
+                                                  ElevatedButton(
+                                                    onPressed: () {
+                                                      Navigator.pop(context);
+                                                      deleteMessage(chatRoomId);
+                                                    },
+                                                    child: const Text("Delete"),
+                                                  )
+                                                ],
+                                              )
+                                            ],
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                  );
+                                },
+                                child: messages(size, map, context));
+                          },
+                        );
+                      } else {
+                        return Container();
+                      }
+                    },
+                  ),
+                ),
+                Container(
+                  height: size.height / 10,
+                  width: size.width,
+                  alignment: Alignment.center,
+                  child: SizedBox(
+                    height: size.height / 12,
+                    width: size.width / 1.1,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        SizedBox(
+                          height: size.height / 17,
+                          width: size.width / 1.3,
+                          child: TextField(
+                            keyboardAppearance: Brightness.dark,
+                            controller: _message,
+                            decoration: InputDecoration(
+                              suffixIcon: IconButton(
+                                onPressed: () => getImage(),
+                                icon: const Icon(Icons.photo),
+                              ),
+                              hintText: 'Send Message',
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                            ),
                           ),
                         ),
-                      ),
+                        IconButton(
+                          onPressed: onSendMessage,
+                          icon: const Icon(Icons.send),
+                        ),
+                      ],
                     ),
-                    IconButton(
-                      onPressed: onSendMessage,
-                      icon: const Icon(Icons.send),
-                    ),
-                  ],
-                ),
-              ),
-            )
+                  ),
+                )
+              ],
+            ),
           ],
         ),
       ),
@@ -235,7 +313,7 @@ class ChatRoom extends StatelessWidget {
                         map['message'],
                         fit: BoxFit.cover,
                       )
-                    : CircularProgressIndicator(),
+                    : const CircularProgressIndicator(),
               ),
             ),
           );
