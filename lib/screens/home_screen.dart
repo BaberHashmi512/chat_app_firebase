@@ -97,6 +97,12 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     final size = MediaQuery.of(context).size;
     return Scaffold(
       appBar: AppBar(
+        leading: const Padding(
+          padding: EdgeInsets.only(left: 12, top: 10),
+          child: CircleAvatar(
+              radius: 20,
+              backgroundImage: AssetImage("assets/images/chat.png")),
+        ),
         centerTitle: true,
         title: const Text(
           "Home Screen",
@@ -104,10 +110,11 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
         ),
         actions: [
           IconButton(
-              onPressed: () {
-                FirebaseAuth.instance.signOut();
-              },
-              icon: const Icon(Icons.exit_to_app))
+            onPressed: () {
+              FirebaseAuth.instance.signOut();
+            },
+            icon: const Icon(Icons.exit_to_app),
+          ),
         ],
       ),
       body: isLoading
@@ -153,7 +160,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                 userMap != null
                     ? ListTile(
                         onTap: () {
-                          String roomId = chatRoomId(
+                         String roomId = chatRoomId(
                               _auth.currentUser!.displayName.toString(),
                               userMap!['username']);
                           Navigator.of(context).push(

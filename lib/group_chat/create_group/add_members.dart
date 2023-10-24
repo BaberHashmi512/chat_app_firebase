@@ -12,8 +12,8 @@ class AddMembersInGroup extends StatefulWidget {
 
 class _AddMembersInGroupState extends State<AddMembersInGroup> {
   final TextEditingController _search = TextEditingController();
-  FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
   List<Map<String, dynamic>> membersList = [];
   bool isLoading = false;
   Map<String, dynamic>? userMap;
@@ -47,7 +47,7 @@ class _AddMembersInGroupState extends State<AddMembersInGroup> {
     setState(
       () {
         isLoading = true;
-      },
+        },
     );
 
     await _firestore

@@ -37,6 +37,7 @@ class ChatRoom extends StatelessWidget {
         .collection('chats')
         .doc(fileName)
         .set({
+      "id": fileName,
       "sendby": _auth.currentUser!.displayName,
       "message": "",
       "type": "img",
@@ -68,8 +69,10 @@ class ChatRoom extends StatelessWidget {
 
   ///  sending a Message
   void onSendMessage() async {
+    String messageId = const Uuid().v1();
     if (_message.text.isNotEmpty) {
       Map<String, dynamic> messages = {
+        "id": messageId,
         "sendby": _auth.currentUser!.displayName,
         "message": _message.text,
         "type": "text",
@@ -81,7 +84,8 @@ class ChatRoom extends StatelessWidget {
           .collection('chatroom')
           .doc(chatRoomId)
           .collection('chats')
-          .add(messages);
+          .doc(messageId)
+          .set(messages);
     } else {
       print("Enter Some Text");
     }
@@ -91,7 +95,7 @@ class ChatRoom extends StatelessWidget {
     await FirebaseFirestore.instance
         .collection("chatroom")
         .doc(chatRoomId)
-        .collection("messages")
+        .collection("chats")
         .doc(messageId)
         .delete();
   }
@@ -100,10 +104,10 @@ class ChatRoom extends StatelessWidget {
     await FirebaseFirestore.instance
         .collection("chatroom")
         .doc(chatRoomId)
-        .collection("messages")
+        .collection("chats")
         .doc(messageId)
         .update({
-      "text": newText,
+      "message": newText,
       "edited": true,
       "editedOn": DateTime.now(),
     });
@@ -113,7 +117,7 @@ class ChatRoom extends StatelessWidget {
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
     return GestureDetector(
-      onTap: ()=> FocusManager.instance.primaryFocus?.unfocus(),
+      onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
       child: Scaffold(
         resizeToAvoidBottomInset: true,
         appBar: AppBar(
@@ -161,58 +165,136 @@ class ChatRoom extends StatelessWidget {
                         return ListView.builder(
                           itemCount: snapshot.data!.docs.length,
                           itemBuilder: (context, index) {
-                            Map<String, dynamic> map = snapshot.data!.docs[index]
-                                .data() as Map<String, dynamic>;
+                            Map<String, dynamic> map =
+                                snapshot.data!.docs[index].data()
+                                    as Map<String, dynamic>;
                             return GestureDetector(
-                                onLongPress: () {
-                                  showDialog(
-                                    context: (context),
-                                    builder: (context) {
-                                      return AlertDialog(
-                                        title: Container(
-                                          decoration: BoxDecoration(
-                                            borderRadius: BorderRadius.circular(30),
-                                          ),
-                                          child: Column(
-                                            children: [
-                                              const Center(
-                                                child: Text(
-                                                  "Delete or Edit",
-                                                  style: TextStyle(
-                                                    fontWeight: FontWeight.bold,
-                                                  ),
+                              onLongPress: () {
+                                showDialog(
+                                  context: (context),
+                                  builder: (context) {
+                                    return AlertDialog(
+                                      title: Container(
+                                        decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(30),
+                                        ),
+                                        child: Column(
+                                          children: [
+                                            const Center(
+                                              child: Text(
+                                                "Delete or Edit",
+                                                style: TextStyle(
+                                                  fontWeight: FontWeight.bold,
                                                 ),
                                               ),
-                                              const SizedBox(
-                                                height: 30,
-                                              ),
-                                              const Text(
-                                                'Are you want to Delete or Edit this Message',
-                                              ),
-                                              const SizedBox(
-                                                height: 30,
-                                              ),
-                                              Row(
-                                                mainAxisAlignment:
-                                                MainAxisAlignment.spaceBetween,
-                                                children: [
-                                                  ElevatedButton(
-                                                    onPressed: () {
-                                                      Navigator.pop(context);
-                                                      deleteMessage(chatRoomId);
-                                                    },
-                                                    child: const Text("Delete"),
-                                                  )
-                                                ],
-                                              )
-                                            ],
-                                          ),
+                                            ),
+                                            const SizedBox(
+                                              height: 30,
+                                            ),
+                                            const Text(
+                                              'Are you want to Delete or Edit this Message',
+                                            ),
+                                            const SizedBox(
+                                              height: 30,
+                                            ),
+                                            Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
+                                              children: [
+                                                ElevatedButton(
+                                                  onPressed: () {
+                                                    Navigator.pop(context);
+                                                    deleteMessage(map["id"]);
+                                                  },
+                                                  child: const Text("Delete"),
+                                                ),
+                                                ElevatedButton(
+                                                  style: const ButtonStyle(
+                                                    backgroundColor:
+                                                        MaterialStatePropertyAll(
+                                                            Colors.red),
+                                                  ),
+                                                  onPressed: () {
+                                                    Navigator.of(context).pop();
+                                                  },
+                                                  child: const Text('Cancel'),
+                                                ),
+                                                ElevatedButton(
+                                                  style: const ButtonStyle(
+                                                    backgroundColor:
+                                                        MaterialStatePropertyAll(
+                                                            Colors.white),
+                                                  ),
+                                                  onPressed: () {
+                                                    Navigator.of(context).pop();
+                                                    showDialog(
+                                                      context: context,
+                                                      builder: (context) {
+                                                        TextEditingController
+                                                            editController =
+                                                            TextEditingController();
+                                                        return AlertDialog(
+                                                          title: const Text(
+                                                              'Edit Message'),
+                                                          content: TextField(
+                                                            controller:
+                                                                editController,
+                                                            decoration:
+                                                                const InputDecoration(
+                                                              hintText:
+                                                                  'Enter edited message',
+                                                            ),
+                                                          ),
+                                                          actions: [
+                                                            ElevatedButton(
+                                                              onPressed: () {
+                                                                String
+                                                                    editedText =
+                                                                    editController
+                                                                        .text
+                                                                        .trim();
+                                                                if (editedText
+                                                                    .isNotEmpty) {
+                                                                  editMessage(
+                                                                      map['id'],
+                                                                      editedText);
+                                                                  Navigator.of(
+                                                                          context)
+                                                                      .pop();
+                                                                }
+                                                              },
+                                                              child: const Text(
+                                                                  'Save'),
+                                                            ),
+                                                            ElevatedButton(
+                                                              onPressed: () {
+                                                                Navigator.of(
+                                                                        context)
+                                                                    .pop();
+                                                              },
+                                                              child: const Text(
+                                                                  'Cancel'),
+                                                            ),
+                                                          ],
+                                                        );
+                                                      },
+                                                    );
+                                                  },
+                                                  child: Text('Edit'),
+                                                ),
+                                              ],
+                                            )
+                                          ],
                                         ),
-                                      );
-                                    },
-                                  );
-                                },
-                                child: messages(size, map, context));
+                                      ),
+                                    );
+                                  },
+                                );
+                              },
+                              child: messages(size, map, context),
+                            );
                           },
                         );
                       } else {
@@ -265,7 +347,11 @@ class ChatRoom extends StatelessWidget {
     );
   }
 
-  Widget messages(Size size, Map<String, dynamic> map, BuildContext context) {
+  Widget messages(
+    Size size,
+    Map<String, dynamic> map,
+    BuildContext context,
+  ) {
     return map['type'] == "text"
         ? Container(
             width: size.width,
