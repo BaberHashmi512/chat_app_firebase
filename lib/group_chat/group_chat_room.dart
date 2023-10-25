@@ -78,7 +78,8 @@ class GroupChatRoom extends StatelessWidget {
           .collection('groups')
           .doc(groupChatId)
           .collection('chats')
-          .add(chatData);
+          .doc(messageId)
+          .set(chatData);
     }
   }
 
@@ -102,7 +103,6 @@ class GroupChatRoom extends StatelessWidget {
   }
 
   void editMessage(String messageId, String newText) async {
-    print("messageId $messageId");
     await FirebaseFirestore.instance
         .collection("groups")
         .doc(groupChatId)
@@ -193,7 +193,7 @@ class GroupChatRoom extends StatelessWidget {
                                               onPressed: () {
                                                 print("I love you $chatMap");
                                                 Navigator.pop(context);
-                                                deleteMessage("id");
+                                                deleteMessage(chatMap["id"]);
                                               },
                                               child: const Text("Delete"),
                                             ),

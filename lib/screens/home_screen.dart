@@ -98,10 +98,12 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     return Scaffold(
       appBar: AppBar(
         leading: const Padding(
-          padding: EdgeInsets.only(left: 12, top: 10),
+          padding: EdgeInsets.only(left: 15, top: 10),
           child: CircleAvatar(
-              radius: 20,
-              backgroundImage: AssetImage("assets/images/chat.png")),
+            radius: 20,
+            backgroundImage:
+            AssetImage("assets/images/chat.png"),
+          ),
         ),
         centerTitle: true,
         title: const Text(
@@ -160,7 +162,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                 userMap != null
                     ? ListTile(
                         onTap: () {
-                         String roomId = chatRoomId(
+                          String roomId = chatRoomId(
                               _auth.currentUser!.displayName.toString(),
                               userMap!['username']);
                           Navigator.of(context).push(
@@ -178,15 +180,6 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                             userMap!['image_url'],
                           ),
                         ),
-                        // CircleAvatar(
-                        //   radius: 23,
-                        //   child: ClipOval(
-                        //     child: Image.network(
-                        //       userMap!['image_url'],
-                        //       fit: BoxFit.cover,
-                        //     ),
-                        //   ),
-                        // ),
                         title: Text(
                           userMap!['username'],
                           style: const TextStyle(

@@ -347,11 +347,7 @@ class ChatRoom extends StatelessWidget {
     );
   }
 
-  Widget messages(
-    Size size,
-    Map<String, dynamic> map,
-    BuildContext context,
-  ) {
+  Widget messages(Size size, Map<String, dynamic> map, BuildContext context) {
     return map['type'] == "text"
         ? Container(
             width: size.width,

@@ -42,6 +42,7 @@ dependencies:
   cloud_firestore: ^4.9.3
   firebase_messaging: ^14.6.8
   uuid: ^4.1.0
+  image_cropper: ^5.0.0
 
 dev_dependencies:
   flutter_test:
