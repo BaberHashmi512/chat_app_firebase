@@ -1,5 +1,6 @@
 import 'package:chat_app/group_chat/group_chat_screen.dart';
 import 'package:chat_app/screens/chat_room.dart';
+import 'package:chat_app/screens/profile.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -97,26 +98,60 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     final size = MediaQuery.of(context).size;
     return Scaffold(
       appBar: AppBar(
-        leading: const Padding(
-          padding: EdgeInsets.only(left: 15, top: 10),
-          child: CircleAvatar(
-            radius: 20,
-            backgroundImage:
-            AssetImage("assets/images/chat.png"),
-          ),
-        ),
         centerTitle: true,
         title: const Text(
           "Home Screen",
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
         actions: [
-          IconButton(
-            onPressed: () {
-              FirebaseAuth.instance.signOut();
-            },
-            icon: const Icon(Icons.exit_to_app),
-          ),
+          PopupMenuButton(itemBuilder: (BuildContext context) {
+            return [
+              PopupMenuItem(
+                value: "profile",
+                child: InkWell(
+                  onTap: () {
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const ProfileScreen(),
+                      ),
+                    );
+                  },
+                  child: const Row(
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.only(right: 8.0),
+                        child: Icon(Icons.person),
+                      ),
+                      Text(
+                        'Profile',
+                        style: TextStyle(fontSize: 15),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              PopupMenuItem(
+                value: "logout",
+                child: InkWell(
+                  onTap: () {
+                    FirebaseAuth.instance.signOut();
+                  },
+                  child: const Row(
+                    children: [
+                      Padding(
+                          padding: EdgeInsets.only(right: 8.0),
+                          child: Icon(Icons.logout)),
+                      Text(
+                        'Logout',
+                        style: TextStyle(fontSize: 15),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ];
+          }),
         ],
       ),
       body: isLoading

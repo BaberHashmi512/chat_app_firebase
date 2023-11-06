@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 
 class UserImagePicker extends StatefulWidget {
@@ -23,11 +24,12 @@ class _UserImagePickerState extends State<UserImagePicker> {
     if (pickedImage == null) {
       return;
     }
-    setState(
-      () {
-        _pickedImageFile = File(pickedImage.path);
-      },
-    );
+    _cropImage(pickedImage);
+    // setState(
+    //   () {
+    //     _pickedImageFile = File(pickedImage.path);
+    //   },
+    // );
     widget.onPickImage(_pickedImageFile!);
   }
 
@@ -52,5 +54,31 @@ class _UserImagePickerState extends State<UserImagePicker> {
         ),
       ],
     );
+  }
+
+  Future _cropImage(image) async {
+    if (image != null) {
+      CroppedFile? cropped = await ImageCropper().cropImage(
+        sourcePath: image.path,
+        aspectRatioPresets: [
+          CropAspectRatioPreset.square,
+        ],
+      );
+
+      if (cropped != null) {
+        setState(
+          () {
+            _pickedImageFile = File(cropped.path);
+          },
+        );
+      } else{
+        _clearImage();
+      }
+    }
+  }
+  void _clearImage() {
+    setState(() {
+      _pickedImageFile = null;
+    });
   }
 }
