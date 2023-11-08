@@ -1,4 +1,5 @@
 import 'package:chat_app/group_chat/group_chat_screen.dart';
+import 'package:chat_app/screens/auth.dart';
 import 'package:chat_app/screens/chat_room.dart';
 import 'package:chat_app/screens/profile.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -82,7 +83,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
 
     await fireStore
         .collection('users')
-        .where("username", isEqualTo: _searchController.text)
+        .where("email", isEqualTo: _searchController.text)
         .get()
         .then((value) {
       setState(() {
@@ -135,13 +136,18 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                 value: "logout",
                 child: InkWell(
                   onTap: () {
+                    Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const AuthScreen()));
                     FirebaseAuth.instance.signOut();
                   },
                   child: const Row(
                     children: [
                       Padding(
-                          padding: EdgeInsets.only(right: 8.0),
-                          child: Icon(Icons.logout)),
+                        padding: EdgeInsets.only(right: 8.0),
+                        child: Icon(Icons.logout),
+                      ),
                       Text(
                         'Logout',
                         style: TextStyle(fontSize: 15),
@@ -177,7 +183,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                     child: TextField(
                       controller: _searchController,
                       decoration: InputDecoration(
-                          hintText: "user name...",
+                          hintText: "Search email here please...",
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(10),
                           )),

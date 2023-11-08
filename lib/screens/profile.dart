@@ -43,7 +43,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   backgroundImage: _selectedImage ??
                       (imgPath.isNotEmpty
                           ? NetworkImage(imgPath)
-                          : AssetImage('assets/images/avatar.png')
+                          : const AssetImage('assets/images/avatar.png')
                               as ImageProvider),
                   child: Stack(
                     children: [

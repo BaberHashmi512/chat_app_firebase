@@ -8,11 +8,13 @@ class UserImagePicker extends StatefulWidget {
 
   final void Function(File pickedImage) onPickImage;
 
+
   @override
   State<UserImagePicker> createState() => _UserImagePickerState();
 }
 
 class _UserImagePickerState extends State<UserImagePicker> {
+  bool loading = false;
   File? _pickedImageFile;
 
   void _pickImage() async {
@@ -24,13 +26,11 @@ class _UserImagePickerState extends State<UserImagePicker> {
     if (pickedImage == null) {
       return;
     }
+    setState(() {
+      loading =true;
+    });
+
     _cropImage(pickedImage);
-    // setState(
-    //   () {
-    //     _pickedImageFile = File(pickedImage.path);
-    //   },
-    // );
-    widget.onPickImage(_pickedImageFile!);
   }
 
   @override
@@ -58,6 +58,9 @@ class _UserImagePickerState extends State<UserImagePicker> {
 
   Future _cropImage(image) async {
     if (image != null) {
+      setState(() {
+        loading =false;
+      });
       CroppedFile? cropped = await ImageCropper().cropImage(
         sourcePath: image.path,
         aspectRatioPresets: [
@@ -71,11 +74,13 @@ class _UserImagePickerState extends State<UserImagePicker> {
             _pickedImageFile = File(cropped.path);
           },
         );
-      } else{
+        widget.onPickImage(_pickedImageFile!);
+      } else {
         _clearImage();
       }
     }
   }
+
   void _clearImage() {
     setState(() {
       _pickedImageFile = null;
