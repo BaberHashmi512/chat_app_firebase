@@ -24,7 +24,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   @override
   void initState() {
     WidgetsBinding.instance.addObserver(this);
-    setStatus("Online");
+    // setStatus("Online");
     super.initState();
   }
 
@@ -48,22 +48,22 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     );
   }
 
-  void setStatus(String status) async {
-    await fireStore.collection('users').doc(_auth.currentUser!.uid).update({
-      "status": status,
-    });
-  }
+  // void setStatus(String status) async {
+  //   await fireStore.collection('users').doc(_auth.currentUser!.uid).update({
+  //     "status": status,
+  //   });
+  // }
 
   @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.resumed) {
-      setStatus("Online");
-      // online
-    } else {
-      setStatus("Offline");
-      // offline
-    }
-  }
+  // void didChangeAppLifecycleState(AppLifecycleState state) {
+  //   if (state == AppLifecycleState.resumed) {
+  //     setStatus("Online");
+  //     // online
+  //   } else {
+  //     setStatus("Offline");
+  //     // offline
+  //   }
+  // }
 
   String chatRoomId(String user1, String user2) {
     if (user1[0].toLowerCase().codeUnits[0] >

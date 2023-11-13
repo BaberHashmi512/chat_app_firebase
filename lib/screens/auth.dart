@@ -320,13 +320,25 @@ class _AuthScreenState extends State<AuthScreen> {
           final userCredentials = await _firebase.signInWithEmailAndPassword(
               email: _enteredEmail, password: _enteredPassword);
         } else {
+          if (await userExists(_enteredUsername)) {
+            // ignore: use_build_context_synchronously
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text("Username is already taken"),
+              ),
+            );
+            setState(
+              () {
+                _isAuthenticating = false;
+              },
+            );
+            return;
+          }
+
           final userCredentials =
-          await _firebase.createUserWithEmailAndPassword(
-              email: _enteredEmail, password: _enteredPassword
-          );
-          // if(await doesUsernameExistsAlready(_enteredUsername)){
-          //   return ;
-          // }
+              await _firebase.createUserWithEmailAndPassword(
+                  email: _enteredEmail, password: _enteredPassword);
+
           userCredentials.user!.updateDisplayName(_enteredUsername);
           final storageRef = FirebaseStorage.instance
               .ref()
@@ -335,14 +347,13 @@ class _AuthScreenState extends State<AuthScreen> {
           await storageRef.putFile(_selectedImage!);
           final imageUrl = await storageRef.getDownloadURL();
 
-
           await FirebaseFirestore.instance
               .collection('users')
               .doc(userCredentials.user!.uid)
               .set({
             'username': _enteredUsername,
             'email': _enteredEmail,
-            'status':'Unavailable',
+            'status': 'Unavailable',
             'image_url': imageUrl,
             "uid": _auth.currentUser!.uid,
           });
@@ -434,7 +445,7 @@ class _AuthScreenState extends State<AuthScreen> {
                             ),
                           TextFormField(
                             decoration:
-                            const InputDecoration(labelText: "Password"),
+                                const InputDecoration(labelText: "Password"),
                             obscureText: true,
                             validator: (value) {
                               if (value == null || value.trim().length < 6) {
@@ -484,16 +495,11 @@ class _AuthScreenState extends State<AuthScreen> {
       ),
     );
   }
-  Future doesUsernameExistsAlready(String username) async {
-    // we get the registered usernames from our database
-    final usernames = await FirebaseFirestore.instance
-        .collection('users')
-        .doc("username")
-        .get();
-    print("Hi $usernames");
-    final data = usernames.data() as Map<String, dynamic>;
 
-    // we return that if a key with that username exists
-    return data.containsKey(username);
-  }
+  Future<bool> userExists(String username) async =>
+      (await FirebaseFirestore.instance
+          .collection("users")
+          .where("username", isEqualTo: username)
+          .get()
+          .then((value) => value.size > 0 ? true : false));
 }

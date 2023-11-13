@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -49,37 +48,40 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     children: [
                       Align(
                         alignment: Alignment.bottomRight,
-                        child: CircleAvatar(radius: 18,
-                        backgroundColor: Colors.white70,
-                        child: GestureDetector(
-                          onTap: getImage,
-                          child: const Icon(CupertinoIcons.camera),
-                        ),
+                        child: CircleAvatar(
+                          radius: 18,
+                          backgroundColor: Colors.white70,
+                          child: GestureDetector(
+                            onTap: getImage,
+                            child: const Icon(CupertinoIcons.camera),
+                          ),
                         ),
                       )
                     ],
                   ),
                 ),
               ),
-              const SizedBox(height: 40,),
+              const SizedBox(
+                height: 40,
+              ),
               TextField(
                 decoration: InputDecoration(
-                  prefixIcon: const Icon(Icons.person),
-                  hintText: "Edit User Name",
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(50)
-                  )
-                ),
+                    prefixIcon: const Icon(Icons.person),
+                    hintText: "Edit User Name",
+                    border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(50))),
               ),
-              SizedBox(height: 40,),
-              ElevatedButton(onPressed: (){}, child: Text("Edit Profile"))
+              const SizedBox(
+                height: 40,
+              ),
+              ElevatedButton(
+                  onPressed: () {}, child: const Text("Edit Profile"))
             ],
           ),
         ),
       ),
     );
   }
-
 
   Future<void> getImage() async {
     showDialog(
