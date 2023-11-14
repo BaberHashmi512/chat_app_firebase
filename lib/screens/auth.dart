@@ -284,6 +284,8 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'dart:io';
 
+import 'package:flutter/services.dart';
+
 final _firebase = FirebaseAuth.instance;
 
 class AuthScreen extends StatefulWidget {
@@ -427,6 +429,8 @@ class _AuthScreenState extends State<AuthScreen> {
                           ),
                           if (!_isLogin)
                             TextFormField(
+                              inputFormatters: [FilteringTextInputFormatter.deny(
+                                  RegExp(r'\s')),],
                               decoration: const InputDecoration(
                                 labelText: "Username",
                               ),

@@ -11,6 +11,7 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
+  TextEditingController _userNameController = TextEditingController();
   ImageProvider? _selectedImage;
   File? _profileImage;
   String imgPath = "";
@@ -66,21 +67,29 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
               TextField(
                 decoration: InputDecoration(
-                    prefixIcon: const Icon(Icons.person),
-                    hintText: "Edit User Name",
-                    border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(50))),
+                  prefixIcon: const Icon(Icons.person),
+                  hintText: "Edit User Name",
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(50),
+                  ),
+                ),
               ),
               const SizedBox(
                 height: 40,
               ),
               ElevatedButton(
-                  onPressed: () {}, child: const Text("Edit Profile"))
+                onPressed: () {},
+                child: const Text("Edit Profile"),
+              )
             ],
           ),
         ),
       ),
     );
+  }
+  void fetchData(){
+
+
   }
 
   Future<void> getImage() async {

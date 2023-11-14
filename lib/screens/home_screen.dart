@@ -15,6 +15,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   Map<String, dynamic>? userMap;
+
   bool isLoading = false;
   final TextEditingController _searchController = TextEditingController();
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -83,7 +84,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
 
     await fireStore
         .collection('users')
-        .where("email", isEqualTo: _searchController.text)
+        .where("username", isEqualTo: _searchController.text)
         .get()
         .then((value) {
       setState(() {
@@ -99,6 +100,9 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     final size = MediaQuery.of(context).size;
     return Scaffold(
       appBar: AppBar(
+        leading: const  Icon(Icons.home,
+          size: 30,
+        ),
         centerTitle: true,
         title: const Text(
           "Home Screen",
@@ -183,7 +187,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                     child: TextField(
                       controller: _searchController,
                       decoration: InputDecoration(
-                          hintText: "Search email here please...",
+                          hintText: "Search username to chat...",
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(10),
                           )),
@@ -230,6 +234,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                         trailing: const Icon(Icons.chat),
                       )
                     : Container(
+                      alignment: Alignment.bottomCenter,
                         child: SingleChildScrollView(
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
@@ -240,6 +245,47 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                                   fontWeight: FontWeight.bold,
                                   fontSize: 24,
                                 ),
+                              ),
+                              SingleChildScrollView(
+                                child: Container(
+                                alignment: Alignment.bottomCenter,
+                                child: StreamBuilder(
+                                  stream: FirebaseFirestore.instance.collection("chatroom").where(
+                                    "chats").snapshots(),
+                                  builder: (context,snapshot){
+                                    if(snapshot.connectionState == ConnectionState.active){
+                                      if(snapshot.hasData){
+                                        QuerySnapshot chatRoomSnapshot = snapshot.data as
+                                        QuerySnapshot;
+                                        return ListView.builder(
+                                          scrollDirection: Axis.vertical,
+                                          shrinkWrap: true,
+                                          itemCount: chatRoomSnapshot.docs.length,
+                                            itemBuilder: (context , index){
+                                            return ListTile(
+                                              leading: userMap!["image_url"],
+                                              title: Text(userMap!['username']),
+                                              subtitle: Text(userMap!['email']),
+                                            );
+                                            }
+                                        );
+                                      }else if(snapshot.hasError){
+                                        return Center(
+                                          child: Text(snapshot.error.toString()),
+                                        );
+                                      } else {
+                                        return const Center(
+                                          child: Text("No Chats"),
+                                        );
+                                      }
+                                    } else {
+                                      return const Center(
+                                        child: CircularProgressIndicator(),
+                                      );
+                                    }
+                                  },
+                                ),
+                              ),
                               ),
                               ElevatedButton(
                                 onPressed: getCurrentUserChats,
@@ -281,5 +327,8 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
         ),
       ),
     );
+  }
+  void getChatList(){
+
   }
 }
