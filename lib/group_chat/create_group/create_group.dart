@@ -1,4 +1,4 @@
-import 'package:chat_app/screens/home_screen.dart';
+import 'package:chat_app/group_chat/group_chat_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -20,20 +20,16 @@ class _CreateGroupState extends State<CreateGroup> {
   bool isLoading = false;
 
   void createGroup() async {
-    setState(
-      () {
-        isLoading = true;
-      },
-    );
+    setState(() {
+      isLoading = true;
+    });
 
-    String groupId = const Uuid().v1();
+    String groupId = Uuid().v1();
 
-    await _firestore.collection('groups').doc(groupId).set(
-      {
-        "members": widget.membersList,
-        "id": groupId,
-      },
-    );
+    await _firestore.collection('groups').doc(groupId).set({
+      "members": widget.membersList,
+      "id": groupId,
+    });
 
     for (int i = 0; i < widget.membersList.length; i++) {
       String uid = widget.membersList[i]['uid'];
@@ -43,27 +39,19 @@ class _CreateGroupState extends State<CreateGroup> {
           .doc(uid)
           .collection('groups')
           .doc(groupId)
-          .set(
-        {
-          "name": _groupName.text,
-          "id": groupId,
-        },
-      );
+          .set({
+        "name": _groupName.text,
+        "id": groupId,
+      });
     }
 
-    await _firestore.collection('groups').doc(groupId).collection('chats').add(
-      {
-        "message": "${_auth.currentUser!.displayName} Created This Group.",
-        "type": "notify",
-      },
-    );
+    await _firestore.collection('groups').doc(groupId).collection('chats').add({
+      "message": "${_auth.currentUser!.displayName} Created This Group.",
+      "type": "notify",
+    });
 
-    // ignore: use_build_context_synchronously
     Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(
-          builder: (_) => const HomeScreen(),
-        ),
-        (route) => false);
+        MaterialPageRoute(builder: (_) => GroupChatHomeScreen()), (route) => false);
   }
 
   @override
@@ -72,47 +60,49 @@ class _CreateGroupState extends State<CreateGroup> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Group Name"),
+        title: Text("Group Name"),
       ),
       body: isLoading
           ? Container(
-              height: size.height,
-              width: size.width,
-              alignment: Alignment.center,
-              child: const CircularProgressIndicator(),
-            )
+        height: size.height,
+        width: size.width,
+        alignment: Alignment.center,
+        child: CircularProgressIndicator(),
+      )
           : Column(
-              children: [
-                SizedBox(
-                  height: size.height / 10,
-                ),
-                Container(
-                  height: size.height / 14,
-                  width: size.width,
-                  alignment: Alignment.center,
-                  child: Container(
-                    height: size.height / 14,
-                    width: size.width / 1.15,
-                    child: TextField(
-                      controller: _groupName,
-                      decoration: InputDecoration(
-                        hintText: "Enter Group Name",
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                      ),
-                    ),
+        children: [
+          SizedBox(
+            height: size.height / 10,
+          ),
+          Container(
+            height: size.height / 14,
+            width: size.width,
+            alignment: Alignment.center,
+            child: Container(
+              height: size.height / 14,
+              width: size.width / 1.15,
+              child: TextField(
+                controller: _groupName,
+                decoration: InputDecoration(
+                  hintText: "Enter Group Name",
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
                   ),
                 ),
-                SizedBox(
-                  height: size.height / 50,
-                ),
-                ElevatedButton(
-                  onPressed: createGroup,
-                  child: const Text("Create Group"),
-                ),
-              ],
+              ),
             ),
+          ),
+          SizedBox(
+            height: size.height / 50,
+          ),
+          ElevatedButton(
+            onPressed: createGroup,
+            child: Text("Create Group"),
+          ),
+        ],
+      ),
     );
   }
 }
+
+
