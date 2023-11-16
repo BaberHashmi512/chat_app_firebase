@@ -48,13 +48,13 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         await storageReference.putFile(_selectedImage!);
         String downloadURL = await storageReference.getDownloadURL();
         await FirebaseFirestore.instance.collection('users').doc(uid).update({
-          'name': _fullNameController.text,
+          'username': _fullNameController.text,
           'email': _emailController.text,
-          'profileImageUrl': downloadURL,
+          'image_url': downloadURL,
         });
       } else {
         await FirebaseFirestore.instance.collection('users').doc(uid).update({
-          'name': _fullNameController.text,
+          'username': _fullNameController.text,
           'email': _emailController.text,
         });
       }
@@ -69,7 +69,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Edit Profile'),
+        title: const Text('Edit Profile'),
       ),
       body: Padding(
           padding: const EdgeInsets.all(16.0),

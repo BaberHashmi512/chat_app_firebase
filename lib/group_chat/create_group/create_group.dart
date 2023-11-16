@@ -51,7 +51,8 @@ class _CreateGroupState extends State<CreateGroup> {
     });
 
     Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(builder: (_) => GroupChatHomeScreen()), (route) => false);
+        MaterialPageRoute(builder: (_) => const GroupChatHomeScreen()),
+            (route) => false);
   }
 
   @override
@@ -60,16 +61,15 @@ class _CreateGroupState extends State<CreateGroup> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text("Group Name"),
+        title: const Text("Group Name"),
       ),
       body: isLoading
           ? Container(
         height: size.height,
         width: size.width,
         alignment: Alignment.center,
-        child: CircularProgressIndicator(),
-      )
-          : Column(
+        child: const CircularProgressIndicator(),
+         ) : Column(
         children: [
           SizedBox(
             height: size.height / 10,
@@ -97,7 +97,7 @@ class _CreateGroupState extends State<CreateGroup> {
           ),
           ElevatedButton(
             onPressed: createGroup,
-            child: Text("Create Group"),
+            child: const Text("Create Group"),
           ),
         ],
       ),

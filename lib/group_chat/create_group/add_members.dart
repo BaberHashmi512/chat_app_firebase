@@ -143,7 +143,7 @@ class _AddMembersInGroupState extends State<AddMembersInGroup> {
                 child: TextField(
                   controller: _search,
                   decoration: InputDecoration(
-                    hintText: "Search",
+                    hintText: "Search email here",
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),

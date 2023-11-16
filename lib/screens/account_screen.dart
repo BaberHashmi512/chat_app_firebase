@@ -1,10 +1,8 @@
-import 'dart:ui';
-
+import 'package:chat_app/Models/UserModel.dart';
 import 'package:chat_app/screens/auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import '../Models/UserModel.dart';
 import 'EditProfile.dart';
 
 class AccountScreen extends StatefulWidget {
@@ -47,11 +45,11 @@ class _AccountScreenState extends State<AccountScreen> {
         centerTitle: true,
         title: const Text(
           'User Information',
-          style: TextStyle(color: Colors.black),
+          style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
         ),
         elevation: 0,
         iconTheme: IconThemeData.fallback(),
-        backgroundColor: Colors.blue,
+        // backgroundColor: Colors.blue,
         actions: [
           IconButton(
             icon: const Icon(Icons.edit, color: Colors.black),
@@ -65,12 +63,9 @@ class _AccountScreenState extends State<AccountScreen> {
         ],
       ),
       body: Container(
-        // color: Color.fromRGBO(150, 182, 197, 10),
-        // color: Colors.black38,
-        // decoration: new BoxDecoration(color: Colors.white.withOpacity(0.1)),
         child: RefreshIndicator(
           onRefresh: () async {
-            await Future.delayed(Duration(milliseconds: 500));
+            await Future.delayed(const Duration(milliseconds: 500));
             setState(() {
               _fetchUserData();
             });
@@ -95,9 +90,9 @@ class _AccountScreenState extends State<AccountScreen> {
                       ),
                       Container(
                         width: 350,
-                        height: 160,
+                        height: 150,
                         decoration: BoxDecoration(
-                            color: Colors.lightBlueAccent,
+                            color: Colors.blueGrey,
                             borderRadius: BorderRadius.circular(20)
                         ),
                         child: Column(
@@ -121,7 +116,7 @@ class _AccountScreenState extends State<AccountScreen> {
                               ),
                             ),
                             const SizedBox(
-                              height: 40,
+                              height: 28,
                             ),
                             Padding(
                               padding: const EdgeInsets.only(left: 12),
@@ -139,21 +134,20 @@ class _AccountScreenState extends State<AccountScreen> {
                                 ],
                               ),
                             ),
-                            SizedBox(
+                            const SizedBox(
                               height: 40,
                             ),
-
                           ],
                         ),
                       ),
-                      SizedBox(
+                      const SizedBox(
                         height: 50,
                       ),
                       GestureDetector(
                         onTap: () {
                           showLogoutDialogue();
                         },
-                        child: Row(
+                        child: const Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Icon(Icons.logout, color: Colors.red,size: 30,),
@@ -189,11 +183,11 @@ class _AccountScreenState extends State<AccountScreen> {
                   child: Text('Logout',
                       style: TextStyle(fontWeight: FontWeight.bold)),
                 ),
-                SizedBox(
+                const SizedBox(
                   height: 30,
                 ),
-                Text('Are you want to Logout'),
-                SizedBox(
+                const Text('Are you want to Logout'),
+                const SizedBox(
                   height: 30,
                 ),
                 Row(
@@ -206,19 +200,19 @@ class _AccountScreenState extends State<AccountScreen> {
                         onPressed: () {
                           Navigator.of(context).pop();
                         },
-                        child: Text('No')),
+                        child: const Text('No')),
                     ElevatedButton(
-                        style: ButtonStyle(
+                        style: const ButtonStyle(
                             backgroundColor:
                             MaterialStatePropertyAll(Colors.blue)),
                         onPressed: () {
                           Navigator.pushReplacement(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => AuthScreen(),
+                                builder: (context) => const AuthScreen(),
                               ));
                         },
-                        child: Text('Yes')),
+                        child: const Text('Yes')),
                   ],
                 ),
               ],

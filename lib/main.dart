@@ -77,8 +77,10 @@ void main() async {
       runApp(
           MyAppLoggedIn(userModel: thisUserModel, firebaseUser: currentUser));
     } else {
-      runApp(const MyApp());
+    runApp(const MyApp());
     }
+  } else {
+      runApp(const MyApp());
   }
 }
 
@@ -99,14 +101,12 @@ class MyAppLoggedIn extends StatelessWidget {
   final User firebaseUser;
 
   const MyAppLoggedIn(
-      {Key? key, required this.userModel, required this.firebaseUser})
-      : super(key: key);
+      {Key? key, required this.userModel, required this.firebaseUser}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       theme: ThemeData().copyWith(
-        useMaterial3: true,
         colorScheme: ColorScheme.fromSeed(
           seedColor: const Color.fromARGB(255, 63, 17, 177),
         ),
