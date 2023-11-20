@@ -55,6 +55,7 @@
 import 'package:chat_app/firebase_options.dart';
 import 'package:chat_app/screens/auth.dart';
 import 'package:chat_app/screens/home_list_screen.dart';
+import 'package:chat_app/screens/splash.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -89,9 +90,24 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
+    return  const MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: AuthScreen(),
+      home: AuthScreen()
+      // StreamBuilder(
+      //   stream: FirebaseAuth.instance.authStateChanges(),
+      //   builder: (ctx, snapshot) {
+      //     if (snapshot.connectionState == ConnectionState.waiting) {
+      //       return const SplashScreen();
+      //     }
+      //     if (snapshot.hasData) {
+      //       return  HomeChat(
+      //           userModel: UserModel(),
+      //           firebaseUser: snapshot.data as User,.3-
+      //       );
+      //     }
+      //     return const AuthScreen();
+      //   },
+      // ),
     );
   }
 }

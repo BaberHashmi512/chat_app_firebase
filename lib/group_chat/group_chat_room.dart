@@ -317,7 +317,8 @@ class GroupChatRoom extends StatelessWidget {
                       ),
                     ),
                     IconButton(
-                        icon: const Icon(Icons.send), onPressed: onSendMessage),
+                        icon: const Icon(Icons.send),
+                        onPressed: onSendMessage),
                   ],
                 ),
               ),

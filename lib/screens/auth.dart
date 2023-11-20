@@ -1,10 +1,12 @@
 import 'dart:io';
+import 'package:chat_app/screens/home_list_screen.dart';
 import 'package:chat_app/widgets/user_image_picker.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 final _firebase = FirebaseAuth.instance;
 
@@ -185,29 +187,92 @@ class _AuthScreenState extends State<AuthScreen> {
                           const SizedBox(
                             height: 12,
                           ),
-                          if (_isAuthenticating)
-                            const CircularProgressIndicator(),
-                          if (!_isAuthenticating)
-                            ElevatedButton(
-                              onPressed: _submit,
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Theme.of(context)
-                                    .colorScheme
-                                    .primaryContainer,
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Padding(padding: EdgeInsets.only(left: 110)),
+                              if (_isAuthenticating)
+                                const CircularProgressIndicator(),
+                              if (!_isAuthenticating)
+                                ElevatedButton(
+                                  onPressed: _submit,
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Theme.of(context)
+                                        .colorScheme
+                                        .primaryContainer,
+                                  ),
+                                  child: Text(_isLogin ? "Login" : "Sign Up"),
+                                ),
+                              const SizedBox(
+                                width: 5,
                               ),
-                              child: Text(_isLogin ? "Login" : "Sign Up"),
+                              if (!_isAuthenticating)
+                                // ElevatedButton(
+                                //   style: ElevatedButton.styleFrom(
+                                //       backgroundColor: Theme.of(context)
+                                //           .colorScheme
+                                //           .primaryContainer),
+                                //   onPressed: () {
+                                //     setState(() {
+                                //       _isLogin = !_isLogin;
+                                //     });
+                                //   },
+                                //   child: Text(_isLogin
+                                //       ? "Create an Account"
+                                //       : "I already have an Account"),
+                                // ),
+                              TextButton(
+                                onPressed: () {
+                                  setState(() {
+                                    _isLogin = !_isLogin;
+                                  });
+                                },
+                                child: Text(_isLogin
+                                    ? "Create an Account"
+                                    : "I already have an account"),
+                              )
+                            ],
+                          ),
+                          SizedBox(height: 10,),
+                          SizedBox(
+                            width: 200,
+                            height: 40,
+                            child: ElevatedButton.icon(
+                              style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.redAccent),
+                              onPressed: googleLogin,
+                              icon: Image.asset(
+                                "assets/images/Google.png",
+                                height: 20,
+                                width: 20,
+                              ),
+                              label: const Text(
+                                "Sign in with Google",
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
                             ),
-                          if (!_isAuthenticating)
-                            TextButton(
-                              onPressed: () {
-                                setState(() {
-                                  _isLogin = !_isLogin;
-                                });
-                              },
-                              child: Text(_isLogin
-                                  ? "Create an Account"
-                                  : "I already have an account"),
-                            )
+                          ),
+                          const SizedBox(
+                            height: 10,
+                          ),
+                          SizedBox(
+                            width: 200,
+                            height: 40,
+                            child: ElevatedButton.icon(
+                              style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.blue),
+                              onPressed: () {},
+                              icon: Image.asset(
+                                "assets/images/Facebook.png",
+                                height: 20,
+                                width: 20,
+                              ),
+                              label: const Text(
+                                "Sign in with Facebook",
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                          )
                         ],
                       ),
                     ),
@@ -219,6 +284,30 @@ class _AuthScreenState extends State<AuthScreen> {
         ),
       ),
     );
+  }
+
+  googleLogin() async {
+    print("googleLogin method Called");
+    GoogleSignIn _googleSignIn = GoogleSignIn();
+    try {
+      var result = await _googleSignIn.signIn();
+      if (result == null) {
+        return;
+      }
+
+      final userData = await result.authentication;
+      final credential = GoogleAuthProvider.credential(
+          accessToken: userData.accessToken, idToken: userData.idToken);
+      var finalResult =
+          await FirebaseAuth.instance.signInWithCredential(credential);
+      print("Result $result");
+      print(result.displayName);
+      print(result.email);
+      print(result.photoUrl);
+      print(finalResult);
+    } catch (error) {
+      print(error);
+    }
   }
 
   Future<bool> userExists(String username) async =>

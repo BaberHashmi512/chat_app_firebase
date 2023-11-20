@@ -675,41 +675,29 @@ class ChatRoomPage extends StatelessWidget {
                                                                 ),
                                                                 actions: [
                                                                   ElevatedButton(
-                                                                    onPressed:
-                                                                        () {
-                                                                      String
-                                                                      editedText =
-                                                                      editController
-                                                                          .text
-                                                                          .trim();
-                                                                      if (editedText
-                                                                          .isNotEmpty) {
-                                                                        editMessage(
-                                                                            currentMessage.messageid.toString(),
+                                                                    onPressed: () {
+                                                                      String editedText = editController.text.trim();
+                                                                      if (editedText.isNotEmpty) {
+                                                                        editMessage(currentMessage.messageid.toString(),
                                                                             editedText);
-                                                                        Navigator.of(context)
-                                                                            .pop();
+                                                                        Navigator.of(context).pop();
                                                                       }
                                                                     },
-                                                                    child: Text(
-                                                                        'Save'),
+                                                                    child: const Text('Save'),
                                                                   ),
                                                                   ElevatedButton(
                                                                     onPressed:
                                                                         () {
-                                                                      Navigator.of(
-                                                                          context)
-                                                                          .pop();
+                                                                      Navigator.of(context).pop();
                                                                     },
-                                                                    child: Text(
-                                                                        'Cancel'),
+                                                                    child: const Text('Cancel'),
                                                                   ),
                                                                 ],
                                                               );
                                                             },
                                                           );
                                                         },
-                                                        child: Text('Edit'),
+                                                        child: const Text('Edit'),
                                                       ),
                                                   ],
                                                 ),
@@ -721,7 +709,7 @@ class ChatRoomPage extends StatelessWidget {
                                     );
                                   },
                                   child: Container(
-                                    margin: EdgeInsets.only(top: 20),
+                                    margin: const EdgeInsets.only(top: 20),
                                     child: Row(
                                         mainAxisAlignment:
                                         (currentMessage.sender ==
@@ -736,11 +724,11 @@ class ChatRoomPage extends StatelessWidget {
                                                   targetUser.profilpic
                                                       .toString()),
                                             ),
-                                          SizedBox(
+                                          const SizedBox(
                                             width: 10,
                                           ),
                                           Container(
-                                              padding: EdgeInsets.symmetric(
+                                              padding: const EdgeInsets.symmetric(
                                                 vertical: 10,
                                                 horizontal: 10,
                                               ),
@@ -756,11 +744,11 @@ class ChatRoomPage extends StatelessWidget {
                                               ),
                                               child: Text(
                                                 currentMessage.text.toString(),
-                                                style: TextStyle(
+                                                style: const TextStyle(
                                                   color: Colors.white,
                                                 ),
                                               )),
-                                          SizedBox(
+                                          const SizedBox(
                                             width: 10,
                                           ),
                                           if (currentMessage.sender ==
@@ -774,17 +762,17 @@ class ChatRoomPage extends StatelessWidget {
                                 );
                               });
                         } else if (snapshot.hasError) {
-                          return Center(
+                          return const Center(
                             child: Text(
                                 "An error occured! Please check your internet connection."),
                           );
                         } else {
-                          return Center(
+                          return const Center(
                             child: Text("Say hi to your new friend"),
                           );
                         }
                       } else {
-                        return Center(
+                        return const Center(
                           child: CircularProgressIndicator(),
                         );
                       }
@@ -794,14 +782,18 @@ class ChatRoomPage extends StatelessWidget {
               ),
               Container(
                 color: Colors.grey[200],
-                padding: EdgeInsets.symmetric(horizontal: 15, vertical: 5),
+                padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
                 child: Row(
                   children: [
                     Flexible(
                       child: TextField(
                         controller: messageController,
                         maxLines: null,
-                        decoration: InputDecoration(
+                        decoration:  InputDecoration(
+                            suffixIcon: IconButton(
+                              onPressed: () {},
+                              icon: const Icon(Icons.photo),
+                            ),
                             border: InputBorder.none,
                             hintText: "Enter message"),
                       ),
@@ -810,8 +802,7 @@ class ChatRoomPage extends StatelessWidget {
                       onPressed: () {
                         sendMessage();
                       },
-                      icon: Icon(
-                        Icons.send,
+                      icon: Icon( Icons.send,
                         color: Theme.of(context).colorScheme.secondary,
                       ),
                     ),

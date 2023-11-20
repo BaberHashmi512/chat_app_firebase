@@ -239,7 +239,7 @@ class _HomeChatState extends State<HomeChat> with WidgetsBindingObserver {
                     child: InkWell(
                       onTap: () async {
                         showLogoutDialogue();
-                        FirebaseAuth.instance.signOut();
+                        // FirebaseAuth.instance.signOut();
                       },
                       child: const Row(
                         children: [
