@@ -90,24 +90,24 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return  const MaterialApp(
+    return   MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: AuthScreen()
-      // StreamBuilder(
-      //   stream: FirebaseAuth.instance.authStateChanges(),
-      //   builder: (ctx, snapshot) {
-      //     if (snapshot.connectionState == ConnectionState.waiting) {
-      //       return const SplashScreen();
-      //     }
-      //     if (snapshot.hasData) {
-      //       return  HomeChat(
-      //           userModel: UserModel(),
-      //           firebaseUser: snapshot.data as User,.3-
-      //       );
-      //     }
-      //     return const AuthScreen();
-      //   },
-      // ),
+      // home: AuthScreen()
+     home: StreamBuilder(
+        stream: FirebaseAuth.instance.authStateChanges(),
+        builder: (ctx, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const SplashScreen();
+          }
+          if (snapshot.hasData) {
+            return  HomeChat(
+                userModel: UserModel(),
+                firebaseUser: snapshot.data as User
+            );
+          }
+          return const AuthScreen();
+        },
+      ),
     );
   }
 }

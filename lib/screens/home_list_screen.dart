@@ -6,6 +6,7 @@ import 'package:chat_app/screens/auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'SearchPage.dart';
 import 'account_screen.dart';
 import 'chat_room.dart';
@@ -239,6 +240,7 @@ class _HomeChatState extends State<HomeChat> with WidgetsBindingObserver {
                     child: InkWell(
                       onTap: () async {
                         showLogoutDialogue();
+                        logout();
                         // FirebaseAuth.instance.signOut();
                       },
                       child: const Row(
@@ -442,5 +444,9 @@ class _HomeChatState extends State<HomeChat> with WidgetsBindingObserver {
         ),
       ),
     );
+  }
+  Future<void> logout() async {
+    await GoogleSignIn().disconnect();
+    FirebaseAuth.instance.signOut();
   }
 }

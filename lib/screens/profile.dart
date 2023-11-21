@@ -88,8 +88,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
   void fetchData(){
-
-
   }
 
   Future<void> getImage() async {

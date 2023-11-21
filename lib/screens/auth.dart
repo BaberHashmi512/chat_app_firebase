@@ -6,6 +6,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 final _firebase = FirebaseAuth.instance;
@@ -190,18 +191,20 @@ class _AuthScreenState extends State<AuthScreen> {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Padding(padding: EdgeInsets.only(left: 110)),
                               if (_isAuthenticating)
                                 const CircularProgressIndicator(),
                               if (!_isAuthenticating)
-                                ElevatedButton(
-                                  onPressed: _submit,
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: Theme.of(context)
-                                        .colorScheme
-                                        .primaryContainer,
+                                Padding(
+                                  padding: const EdgeInsets.only(left: 110),
+                                  child: ElevatedButton(
+                                    onPressed: _submit,
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Theme.of(context)
+                                          .colorScheme
+                                          .primaryContainer,
+                                    ),
+                                    child: Text(_isLogin ? "Login" : "Sign Up"),
                                   ),
-                                  child: Text(_isLogin ? "Login" : "Sign Up"),
                                 ),
                               const SizedBox(
                                 width: 5,
@@ -233,13 +236,13 @@ class _AuthScreenState extends State<AuthScreen> {
                               )
                             ],
                           ),
-                          SizedBox(height: 10,),
+                          const SizedBox(height: 10,),
                           SizedBox(
                             width: 200,
                             height: 40,
                             child: ElevatedButton.icon(
                               style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.redAccent),
+                                  backgroundColor: Colors.white70),
                               onPressed: googleLogin,
                               icon: Image.asset(
                                 "assets/images/Google.png",
@@ -260,8 +263,10 @@ class _AuthScreenState extends State<AuthScreen> {
                             height: 40,
                             child: ElevatedButton.icon(
                               style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.blue),
-                              onPressed: () {},
+                                  backgroundColor: Colors.white70),
+                              onPressed: () {
+                                facebookLogin();
+                              },
                               icon: Image.asset(
                                 "assets/images/Facebook.png",
                                 height: 20,
@@ -286,11 +291,11 @@ class _AuthScreenState extends State<AuthScreen> {
     );
   }
 
-  googleLogin() async {
+  void googleLogin() async {
     print("googleLogin method Called");
-    GoogleSignIn _googleSignIn = GoogleSignIn();
+    GoogleSignIn googleSignIn = GoogleSignIn();
     try {
-      var result = await _googleSignIn.signIn();
+      var result = await googleSignIn.signIn();
       if (result == null) {
         return;
       }
@@ -299,14 +304,40 @@ class _AuthScreenState extends State<AuthScreen> {
       final credential = GoogleAuthProvider.credential(
           accessToken: userData.accessToken, idToken: userData.idToken);
       var finalResult =
-          await FirebaseAuth.instance.signInWithCredential(credential);
+      await FirebaseAuth.instance.signInWithCredential(credential);
+
       print("Result $result");
       print(result.displayName);
       print(result.email);
       print(result.photoUrl);
-      print(finalResult);
+
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(finalResult.user!.uid)
+          .set({
+        'username': result.displayName,
+        'email': result.email,
+        'status': 'Unavailable',
+        'image_url': result.photoUrl,
+        'uid': finalResult.user!.uid,
+      });
+
+      print("User data uploaded to fireStore");
     } catch (error) {
       print(error);
+    }
+  }
+
+    Future facebookLogin() async {
+    print("FaceBook");
+    try {
+      final result = await FacebookAuth.i.login(permissions: ['public_profile', 'email']);
+      if (result.status == LoginStatus.success) {
+        final userData = await FacebookAuth.i.getUserData();
+        print(userData);
+      }
+    } catch (error) {
+      print("error $error");
     }
   }
 

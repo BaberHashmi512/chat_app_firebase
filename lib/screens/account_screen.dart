@@ -3,6 +3,7 @@ import 'package:chat_app/screens/auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'EditProfile.dart';
 
 class AccountScreen extends StatefulWidget {
@@ -28,7 +29,7 @@ class _AccountScreenState extends State<AccountScreen> {
   void _fetchUserData() async {
     String uid = FirebaseAuth.instance.currentUser!.uid;
     DocumentSnapshot userDoc =
-    await FirebaseFirestore.instance.collection('users').doc(uid).get();
+        await FirebaseFirestore.instance.collection('users').doc(uid).get();
     if (userDoc.exists) {
       setState(() {
         name = userDoc['username'];
@@ -93,12 +94,13 @@ class _AccountScreenState extends State<AccountScreen> {
                         height: 150,
                         decoration: BoxDecoration(
                             color: Colors.blueGrey,
-                            borderRadius: BorderRadius.circular(20)
-                        ),
+                            borderRadius: BorderRadius.circular(20)),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const SizedBox(height: 30,),
+                            const SizedBox(
+                              height: 30,
+                            ),
                             Padding(
                               padding: const EdgeInsets.only(left: 12),
                               child: Row(
@@ -110,7 +112,8 @@ class _AccountScreenState extends State<AccountScreen> {
                                   Text(
                                     'Name : ${name}',
                                     style: const TextStyle(
-                                        fontWeight: FontWeight.bold, fontSize: 18),
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 18),
                                   ),
                                 ],
                               ),
@@ -129,7 +132,8 @@ class _AccountScreenState extends State<AccountScreen> {
                                   Text(
                                     'Email : ${email}',
                                     style: const TextStyle(
-                                        fontWeight: FontWeight.bold, fontSize: 18),
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 18),
                                   ),
                                 ],
                               ),
@@ -150,11 +154,19 @@ class _AccountScreenState extends State<AccountScreen> {
                         child: const Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Icon(Icons.logout, color: Colors.red,size: 30,),
+                            Icon(
+                              Icons.logout,
+                              color: Colors.red,
+                              size: 30,
+                            ),
                             SizedBox(
                               width: 10,
                             ),
-                            Text('Logout', style: TextStyle(color: Colors.red, fontSize: 24, fontWeight: FontWeight.bold)),
+                            Text('Logout',
+                                style: TextStyle(
+                                    color: Colors.red,
+                                    fontSize: 24,
+                                    fontWeight: FontWeight.bold)),
                           ],
                         ),
                       )
@@ -168,6 +180,7 @@ class _AccountScreenState extends State<AccountScreen> {
       ),
     );
   }
+
   void showLogoutDialogue() async {
     return showDialog(
       context: context,
@@ -196,7 +209,7 @@ class _AccountScreenState extends State<AccountScreen> {
                     ElevatedButton(
                         style: const ButtonStyle(
                             backgroundColor:
-                            MaterialStatePropertyAll(Colors.blue)),
+                                MaterialStatePropertyAll(Colors.blue)),
                         onPressed: () {
                           Navigator.of(context).pop();
                         },
@@ -204,15 +217,16 @@ class _AccountScreenState extends State<AccountScreen> {
                     ElevatedButton(
                         style: const ButtonStyle(
                             backgroundColor:
-                            MaterialStatePropertyAll(Colors.blue)),
+                                MaterialStatePropertyAll(Colors.blue)),
                         onPressed: () {
                           Navigator.pushReplacement(
                               context,
                               MaterialPageRoute(
                                 builder: (context) => const AuthScreen(),
                               ));
+                          logout();
                         },
-                        child: const Text('Yes')),
+                        child: const Text('Yes'),),
                   ],
                 ),
               ],
@@ -221,5 +235,9 @@ class _AccountScreenState extends State<AccountScreen> {
         );
       },
     );
+  }
+  Future<void> logout() async {
+    await GoogleSignIn().disconnect();
+    FirebaseAuth.instance.signOut();
   }
 }
