@@ -1,4 +1,6 @@
+import 'dart:convert';
 import 'dart:io';
+import 'package:chat_app/Models/UserModel.dart';
 import 'package:chat_app/screens/home_list_screen.dart';
 import 'package:chat_app/widgets/user_image_picker.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -8,6 +10,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+
+String prettyPrint(Map json) {
+  JsonEncoder encoder = const JsonEncoder.withIndent('  ');
+  String pretty = encoder.convert(json);
+  return pretty;
+}
 
 final _firebase = FirebaseAuth.instance;
 
@@ -27,79 +35,9 @@ class _AuthScreenState extends State<AuthScreen> {
   File? _selectedImage;
   var _isAuthenticating = false;
   var _enteredUsername = "";
-
-  void _submit() async {
-    final isValid = _form.currentState!.validate();
-    if (!isValid || !_isLogin && _selectedImage == null) {
-      // Show error messages
-      return;
-    }
-
-    if (isValid) {
-      _form.currentState!.save();
-      try {
-        setState(() {
-          _isAuthenticating = true;
-        });
-        if (_isLogin) {
-          final userCredentials = await _firebase.signInWithEmailAndPassword(
-              email: _enteredEmail, password: _enteredPassword);
-        } else {
-          if (await userExists(_enteredUsername)) {
-            // ignore: use_build_context_synchronously
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text("Username is already taken"),
-              ),
-            );
-            setState(
-              () {
-                _isAuthenticating = false;
-              },
-            );
-            return;
-          }
-
-          final userCredentials =
-              await _firebase.createUserWithEmailAndPassword(
-                  email: _enteredEmail, password: _enteredPassword);
-
-          userCredentials.user!.updateDisplayName(_enteredUsername);
-          final storageRef = FirebaseStorage.instance
-              .ref()
-              .child('user_images')
-              .child('${userCredentials.user!.uid}.jpg');
-          await storageRef.putFile(_selectedImage!);
-          final imageUrl = await storageRef.getDownloadURL();
-
-          await FirebaseFirestore.instance
-              .collection('users')
-              .doc(userCredentials.user!.uid)
-              .set({
-            'username': _enteredUsername,
-            'email': _enteredEmail,
-            'status': 'Unavailable',
-            'image_url': imageUrl,
-            "uid": _auth.currentUser!.uid,
-          });
-        }
-      } on FirebaseAuthException catch (error) {
-        print('Error: $error');
-        if (error.code == "email-already-in-use") {}
-        // ignore: use_build_context_synchronously
-        ScaffoldMessenger.of(context).clearSnackBars();
-        // ignore: use_build_context_synchronously
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(error.message ?? 'Authentication Failed'),
-          ),
-        );
-        setState(() {
-          _isAuthenticating = false;
-        });
-      }
-    }
-  }
+  Map<String, dynamic>? _userData;
+  AccessToken? _accessToken;
+  bool _checking = true;
 
   @override
   Widget build(BuildContext context) {
@@ -210,33 +148,21 @@ class _AuthScreenState extends State<AuthScreen> {
                                 width: 5,
                               ),
                               if (!_isAuthenticating)
-                                // ElevatedButton(
-                                //   style: ElevatedButton.styleFrom(
-                                //       backgroundColor: Theme.of(context)
-                                //           .colorScheme
-                                //           .primaryContainer),
-                                //   onPressed: () {
-                                //     setState(() {
-                                //       _isLogin = !_isLogin;
-                                //     });
-                                //   },
-                                //   child: Text(_isLogin
-                                //       ? "Create an Account"
-                                //       : "I already have an Account"),
-                                // ),
-                              TextButton(
-                                onPressed: () {
-                                  setState(() {
-                                    _isLogin = !_isLogin;
-                                  });
-                                },
-                                child: Text(_isLogin
-                                    ? "Create an Account"
-                                    : "I already have an account"),
-                              )
+                                TextButton(
+                                  onPressed: () {
+                                    setState(() {
+                                      _isLogin = !_isLogin;
+                                    });
+                                  },
+                                  child: Text(_isLogin
+                                      ? "Create an Account"
+                                      : "I already have an account"),
+                                )
                             ],
                           ),
-                          const SizedBox(height: 10,),
+                          const SizedBox(
+                            height: 10,
+                          ),
                           SizedBox(
                             width: 200,
                             height: 40,
@@ -265,7 +191,7 @@ class _AuthScreenState extends State<AuthScreen> {
                               style: ElevatedButton.styleFrom(
                                   backgroundColor: Colors.white70),
                               onPressed: () {
-                                facebookLogin();
+                                _login();
                               },
                               icon: Image.asset(
                                 "assets/images/Facebook.png",
@@ -291,6 +217,79 @@ class _AuthScreenState extends State<AuthScreen> {
     );
   }
 
+  void _submit() async {
+    final isValid = _form.currentState!.validate();
+    if (!isValid || !_isLogin && _selectedImage == null) {
+      // Show error messages
+      return;
+    }
+
+    if (isValid) {
+      _form.currentState!.save();
+      try {
+        setState(() {
+          _isAuthenticating = true;
+        });
+        if (_isLogin) {
+          final userCredentials = await _firebase.signInWithEmailAndPassword(
+              email: _enteredEmail, password: _enteredPassword);
+        } else {
+          if (await userExists(_enteredUsername)) {
+            // ignore: use_build_context_synchronously
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text("Username is already taken"),
+              ),
+            );
+            setState(
+              () {
+                _isAuthenticating = false;
+              },
+            );
+            return;
+          }
+
+          final userCredentials =
+              await _firebase.createUserWithEmailAndPassword(
+                  email: _enteredEmail, password: _enteredPassword);
+
+          userCredentials.user!.updateDisplayName(_enteredUsername);
+          final storageRef = FirebaseStorage.instance
+              .ref()
+              .child('user_images')
+              .child('${userCredentials.user!.uid}.jpg');
+          await storageRef.putFile(_selectedImage!);
+          final imageUrl = await storageRef.getDownloadURL();
+
+          await FirebaseFirestore.instance
+              .collection('users')
+              .doc(userCredentials.user!.uid)
+              .set({
+            'username': _enteredUsername,
+            'email': _enteredEmail,
+            'status': 'Unavailable',
+            'image_url': imageUrl,
+            "uid": _auth.currentUser!.uid,
+          });
+        }
+      } on FirebaseAuthException catch (error) {
+        print('Error: $error');
+        if (error.code == "email-already-in-use") {}
+        // ignore: use_build_context_synchronously
+        ScaffoldMessenger.of(context).clearSnackBars();
+        // ignore: use_build_context_synchronously
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(error.message ?? 'Authentication Failed'),
+          ),
+        );
+        setState(() {
+          _isAuthenticating = false;
+        });
+      }
+    }
+  }
+
   void googleLogin() async {
     print("googleLogin method Called");
     GoogleSignIn googleSignIn = GoogleSignIn();
@@ -304,7 +303,7 @@ class _AuthScreenState extends State<AuthScreen> {
       final credential = GoogleAuthProvider.credential(
           accessToken: userData.accessToken, idToken: userData.idToken);
       var finalResult =
-      await FirebaseAuth.instance.signInWithCredential(credential);
+          await FirebaseAuth.instance.signInWithCredential(credential);
 
       print("Result $result");
       print(result.displayName);
@@ -322,16 +321,34 @@ class _AuthScreenState extends State<AuthScreen> {
         'uid': finalResult.user!.uid,
       });
 
-      print("User data uploaded to fireStore");
+      print("User data uploaded to Firestore");
+
+      UserModel userModel = UserModel(
+        uid: finalResult.user!.uid,
+        username: result.displayName,
+        email: result.email,
+        profilpic: result.photoUrl,
+        status: 'Unavailable',
+      );
+
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(
+          builder: (context) => HomeChat(
+            userModel: userModel,
+            firebaseUser: finalResult.user!,
+          ),
+        ),
+      );
     } catch (error) {
       print(error);
     }
   }
 
-    Future facebookLogin() async {
+  Future facebookLogin() async {
     print("FaceBook");
     try {
-      final result = await FacebookAuth.i.login(permissions: ['public_profile', 'email']);
+      final result =
+          await FacebookAuth.i.login(permissions: ['public_profile', 'email']);
       if (result.status == LoginStatus.success) {
         final userData = await FacebookAuth.i.getUserData();
         print(userData);
@@ -347,4 +364,27 @@ class _AuthScreenState extends State<AuthScreen> {
           .where("username", isEqualTo: username)
           .get()
           .then((value) => value.size > 0 ? true : false));
+
+  Future<void> _login() async {
+    final LoginResult result = await FacebookAuth.instance.login();
+
+    if (result.status == LoginStatus.success) {
+      _accessToken = result.accessToken;
+      _printCredentials();
+      final userData = await FacebookAuth.instance.getUserData();
+      _userData = userData;
+    } else {
+      print(result.status);
+      print(result.message.toString());
+    }
+    setState(() {
+      _checking = false;
+    });
+  }
+
+  void _printCredentials() {
+    print(
+      prettyPrint(_accessToken!.toJson()),
+    );
+  }
 }

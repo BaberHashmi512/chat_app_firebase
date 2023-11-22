@@ -146,10 +146,11 @@ class _HomeChatState extends State<HomeChat> with WidgetsBindingObserver {
                                 MaterialStatePropertyAll(Colors.blue)),
                         onPressed: () {
                           Navigator.pushReplacement(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const AuthScreen(),
-                              ));
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const AuthScreen(),
+                            ),
+                          );
                         },
                         child: const Text('Yes')),
                   ],
@@ -195,9 +196,10 @@ class _HomeChatState extends State<HomeChat> with WidgetsBindingObserver {
         appBar: AppBar(
             automaticallyImplyLeading: false,
             centerTitle: true,
-            title: const Text("Home Screen", style: TextStyle(
-              fontWeight: FontWeight.bold
-            ),),
+            title: const Text(
+              "Home Screen",
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
             actions: [
               IconButton(
                   onPressed: () {
@@ -312,16 +314,12 @@ class _HomeChatState extends State<HomeChat> with WidgetsBindingObserver {
                                             title: Container(
                                               decoration: BoxDecoration(
                                                 borderRadius:
-                                                    BorderRadius.circular(30),
-                                              ),
+                                                    BorderRadius.circular(30),),
                                               child: Column(
-                                                children: [
-                                                  const Center(
-                                                    child: Text('Delete',
-                                                        style: TextStyle(
-                                                            fontWeight:
-                                                                FontWeight
-                                                                    .bold)),
+                                           children: [
+                                            const Center(
+                                             child: Text('Delete',
+                                              style: TextStyle( fontWeight: FontWeight.bold)),
                                                   ),
                                                   const SizedBox(
                                                     height: 30,
@@ -344,22 +342,25 @@ class _HomeChatState extends State<HomeChat> with WidgetsBindingObserver {
                                                                     Colors.red),
                                                           ),
                                                           onPressed: () {
-                                                            Navigator.of(
-                                                                    context)
-                                                                .pop();
+                                                            Navigator.of(context).pop();
                                                           },
                                                           child:
                                                               const Text('No')),
-                                         ElevatedButton(
-                                             style: const ButtonStyle(
-                                               backgroundColor:
-                                                  MaterialStatePropertyAll(
-                                                           Colors.blue)),
+                                                      ElevatedButton(
+                                                          style: const ButtonStyle(
+                                                    backgroundColor:
+                                                           MaterialStatePropertyAll(
+                                                            Colors.blue)),
                                                           onPressed: () {
-                                                            Navigator.of(context).pop();
-                                                            deleteChatRoom(chatRoomModel.chatroomid);
+                                                            Navigator.of(
+                                                                    context)
+                                                                .pop();
+                                                            deleteChatRoom(
+                                                                chatRoomModel
+                                                                    .chatroomid);
                                                           },
-                                                          child: const Text('Yes')),
+                                                          child: const Text(
+                                                              'Yes')),
                                                     ],
                                                   ),
                                                 ],
@@ -391,10 +392,12 @@ class _HomeChatState extends State<HomeChat> with WidgetsBindingObserver {
                                     trailing: const Icon(Icons.message),
                                     title: Text(targetUser.username.toString()),
                                     subtitle:
-                                        (chatRoomModel.lastMessage.toString() != "")
+                                        (chatRoomModel.lastMessage.toString() !=
+                                                "")
                                             ? Text(chatRoomModel.lastMessage
                                                 .toString())
-                                            : Text("Say hi to your new friend!",
+                                            : Text(
+                                                "Say hi to your new friend!",
                                                 style: TextStyle(
                                                   color: Theme.of(context)
                                                       .colorScheme
@@ -445,6 +448,7 @@ class _HomeChatState extends State<HomeChat> with WidgetsBindingObserver {
       ),
     );
   }
+
   Future<void> logout() async {
     await GoogleSignIn().disconnect();
     FirebaseAuth.instance.signOut();
